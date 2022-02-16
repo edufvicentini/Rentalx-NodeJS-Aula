@@ -39,7 +39,7 @@ Para que não precise passar o /categories em todos os routes dentro de categori
 
 ### Regras de Negócio -> ONDE?
 
-As funções de FindByName / FindByID, devem ser todas criadas no CategoriesRepository dentro da classe. Então a Rota executar passando só o dado passado no request.
+As funções de FindByName / FindByID, devem ser todas criadas no CategoriesRepository dentro da classe. Quem executa a função da regra de negócio é o SERVIÇO CreateService, com o throw new error, ele retorna um erro, senão ele passa e retorna o response na rota.
 
 FindByName deve retornar Category ou undefined, ficando assim:
 
