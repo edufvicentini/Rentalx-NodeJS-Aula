@@ -12,6 +12,11 @@ No final com o Repositories, a rota de Post deve dar um repositories.create(dado
 
 Não vai trazer Retorno por JSON.
 
+As Rotas devem apenas: Receber requisição -> Processar -> Retornar.
+Pelo princípio S do Solid, as rotas não podem validar. Valida em uma outra classe.
+
+Quem faz a validação e criação da categoria não é a rota, ela apenas chama um serviço(SERVICE) chamado CreateCategoryService.execute() que processa os dados e retorna.
+
 ### Repositories
 
 Responsável pela parte de dados, conexão com banco, arquivos JSON, então é por onde transita a informação que é alimentada em cada uma das rotas.
@@ -35,3 +40,31 @@ Para que não precise passar o /categories em todos os routes dentro de categori
 ### Regras de Negócio -> ONDE?
 
 As funções de FindByName / FindByID, devem ser todas criadas no CategoriesRepository dentro da classe. Então a Rota executar passando só o dado passado no request.
+
+FindByName deve retornar Category ou undefined, ficando assim:
+
+findByName(name: string): Category | undefined {}
+
+Se não estiver assim, vai dar erro.
+
+### Services
+
+São pequenas classes responsáveis por processar o request recebido pela rota e retornar alguma coisa para a rota. O service CreateCategoryServices não precisa conhecer o repositório de categorias.
+
+Os erros são gerados diretamente por esta classe, com o throw new Error do Javascript.
+
+Dentro de cada service deve-se dizer para ela quais são os dados que receberá no request. É criada uma interface IRequest que vai dizer qual os types que a função execute vai receber, então no fim a função deve ficar execute({ description, name }: IRequest)
+
+Pelo constructor da classe do Service, devo receber um parâmetro de qual repositório ele vai acessar, portanto dentro dele deve existir:
+
+constructor(private categoriesRepository: CategoriesRepository)
+
+Para que na rota fique assim:
+
+    const createCategoryService = new CreateCategoryService(
+        categoriesRepository,
+    );
+
+    createCategoryService.execute({ name, description });
+
+então foi instanciado passando categoriesRepository e depois executado passando os dados do request
