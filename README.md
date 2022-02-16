@@ -57,14 +57,79 @@ Dentro de cada service deve-se dizer para ela quais são os dados que receberá 
 
 Pelo constructor da classe do Service, devo receber um parâmetro de qual repositório ele vai acessar, portanto dentro dele deve existir:
 
-constructor(private categoriesRepository: CategoriesRepository)
+constructor(private categoriesRepository: ICategoriesRepository)
 
 Para que na rota fique assim:
 
+    const categoriesRepository = new PostgresCategoriesRepository();
+
+    app.post(etc)
+    {
+    {} = request
     const createCategoryService = new CreateCategoryService(
         categoriesRepository,
     );
+    response
+    }
 
     createCategoryService.execute({ name, description });
 
 então foi instanciado passando categoriesRepository e depois executado passando os dados do request
+
+### Liskov
+
+Deve existir um ICategoriesRepository que é uma classe genérica que deve conter duas interfaces, a DTO ICreateCategoryDTO que serão os dados que serão recebidos da requisição, e a interface ICategoriesRepository, que deve apenas listar quais funções devem existir quando esta função for implementada por outra classe.
+
+O serviço agora no constructor vai receber na instância o tipo ICategoriesRepository, que poderá ser qualquer Classe que implementa ICategoriesRepository.
+
+interface ICategoriesRepository {
+    findByName(name: string): Category | undefined;
+    list(): Category[] | null;
+    create({ name, description }: ICreateCategoryDTO): void;
+}
+
+Então se CategoriesRepository implements ICategoriesRepository, eu devo dentro do CategoriesRepository dizer o que cada uma destas funções faz dentro dele.
+
+Se outra classe tipo PostgresRepository implementar ICategoriesRepository, eu devo dizer também o que cada uma desta função faz dentro do postgres.
+
+Desta maneira, o Serviço irá executar funções padronizadas de acordo com o ICategoriesRepository. Sendo que a classe que implementa (CategoriesRepository) deve ser instanciada dentro da rota, como um new CategoriesRepository() ou new PostgresRepository(). Desta forma nós podemos utilizar a mesma estrutura para executar funções completamente diferentes desde que recebam e retornem os mesmos dados. (inclusive este ICategoriesRepository é um schema, ou seja, estrutura padrão de entradas, funções e saídas)
+
+### Qual é a sequência??
+
+Iniciar o Projeto:
+
+1 - Deve ser criado o modelo de objeto que queremos trabalhar. Por exemplo Category.ts. Deve exportar uma classe que possui a estrutura do objeto que queremos trabalhar. Devemos montar com todos os dados esperados e passar o ID opcional. No constructor devemos dizer: Caso não tenha ID, cria um com this.id = uuidv4().
+
+Com o modelo pronto, passaremos a utilizá-lo.
+
+Criar uma rota, por exemplo POST de objeto:
+
+A rota post deve receber os parâmetros, rodar um serviço que crie uma lista de Categorias e retornar se deu certo. Caso ocorra erro, deve ser validado dentro do serviço.
+
+Para isso deve seguir alguns passos:
+
+1 - A rota deve receber os parâmetros via request e passar estes parâmetros para dentro do execute de um serviço
+
+2 - O serviço deve ter um construtor private genérico do tipo Interface criada dentro de repository. Também deve conter uma Interface IRequest que vai ser desestruturada no Execute. Este IRequest deve ser um espelho dos parâmetros recebidos no request.
+
+3- Antes de executar o serviço devemos dar um const serviço = new Service(classe que implementa Interface)
+
+4 - A classe que implementa a Interface genérica, CategoriesRepository (nome de exemplo), deve conter um constructor que vai criar o array que vai receber os dados, assim como todas as funções que serão executadas pelo serviço. Por exemplo: create (para post), list (para get), findByName (para validação). A validação, criação e listagem deve ser feita toda no SERVIÇO, mas quem fornece os dados é o repositório.
+
+5 - O repositório deve implementar uma Interface padrão chamada ICategoriesRepository (nome de exemplo) deve exportar 2 interfaces, uma DTO contendo novamente os parâmetros recebidos pelo request, e a própria classe ICategoriesRepository que vai listar todos os métodos que serão obrigatoriamente implementados dentro de CategoriesRepository. Como no exemplo:
+
+interface ICategoriesRepository {
+    findByName(name: string): Category | undefined;
+    list(): Category[] | null;
+    create({ name, description }: ICreateCategoryDTO): void;
+}
+
+6 - O repositório também deve importar as duas interfaces para que seja utilizada como interface DTO para os métodos Create e interface que vai ser implementada pela própria classe repositório.
+
+7 - O serviço deverá utilizar como base para os dados recebidos, a Interface Genérica, para que qualquer Classe implementada a partir dela seja compatível com aquele serviço. Deve-se dar um import no IRepository.
+
+8 - Na Rota, depois de iniciar o router, deve-se instanciar os repositórios, dando um repository = new Repository().
+
+9 - O serviço que vai executar dentro da rota deve ser instanciado passando como parâmetro o repositório. service = new Service(repository)
+
+10 - Após instanciar, é necessário executar a ação para qual aquele serviço foi projetado, utilizando um service.execute(dados do request)
