@@ -94,6 +94,18 @@ Se outra classe tipo PostgresRepository implementar ICategoriesRepository, eu de
 
 Desta maneira, o Serviço irá executar funções padronizadas de acordo com o ICategoriesRepository. Sendo que a classe que implementa (CategoriesRepository) deve ser instanciada dentro da rota, como um new CategoriesRepository() ou new PostgresRepository(). Desta forma nós podemos utilizar a mesma estrutura para executar funções completamente diferentes desde que recebam e retornem os mesmos dados. (inclusive este ICategoriesRepository é um schema, ou seja, estrutura padrão de entradas, funções e saídas)
 
+### Controller e UseCases
+
+O responsável por realizar o recebimento da request e response e passar para o service não é a rota, e sim um arquivo Controller. Este arquivo controler deve exportar uma classe chamada por exemplo CreateCategoryController, que recebe o service pelo constructor que agora possui o nome de UseCase, e tudo isso é instanciado por um arquivo index dentro da pasta para aquela ação específica. O index instancia o repositório que é passado para dentro do useCase, e o useCase é passado para dentro do Controller, e o controller é exportado para ser utilizado nas rotas. o Handle do controller deve sempre retornar o response.status, portanto na rota apenas é rodado no post 
+
+return createCategoryController(request, response);
+
+Portanto toda a responsabilidade de trabalhar com a request e a response fica com para o controller especificamente
+
+### Conceito Singleton
+
+Um repositório é instanciado dentro do próprio arquivo de repositório utilizando uma variável private static INSTANCE que vai ser a instância do repositório. Todos os Index vão passar a rodar um método chamado getInstance() que, caso o repositório nunca tenha sido instanciado, ele vai instanciar ele na variável INSTANCE. se ela já foi instanciada, só retorna INSTANCE.
+
 ### Qual é a sequência??
 
 Iniciar o Projeto:
