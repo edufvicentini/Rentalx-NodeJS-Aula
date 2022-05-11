@@ -14,6 +14,7 @@ class ImportCategoryController {
         }
 
         await importCategoryUseCase.execute(file);
+
         return response.status(201).send();
     }
 }

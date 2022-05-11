@@ -5,23 +5,33 @@ export class CreateCategories1645671960312 implements MigrationInterface {
         await queryRunner.createTable(
             new Table({
                 name: 'categories',
+
                 columns: [
                     {
                         name: 'id',
+
                         type: 'uuid',
+
                         isPrimary: true,
                     },
+
                     {
                         name: 'name',
+
                         type: 'varchar',
                     },
+
                     {
                         name: 'description',
+
                         type: 'varchar',
                     },
+
                     {
                         name: 'created_at',
+
                         type: 'timestamp',
+
                         default: 'now()',
                     },
                 ],
