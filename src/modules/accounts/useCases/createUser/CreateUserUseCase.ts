@@ -1,4 +1,4 @@
-import { hash } from 'bcrypt';
+import { hash } from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '../../../../errors/AppError';
@@ -15,6 +15,8 @@ class CreateUserUseCase {
         email,
         driver_license,
         password,
+        avatar,
+        id,
     }: ICreateUserDTO): Promise<void> {
         const userAlreadyExists = await this.usersRepository.findByEmail(email);
 
@@ -28,6 +30,8 @@ class CreateUserUseCase {
             email,
             driver_license,
             password: passwordHash,
+            avatar,
+            id,
         });
     }
 }

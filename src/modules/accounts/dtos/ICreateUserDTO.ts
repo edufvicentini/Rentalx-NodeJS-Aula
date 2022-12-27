@@ -6,6 +6,10 @@ interface ICreateUserDTO {
     email: string;
 
     driver_license: string;
+
+    avatar: string;
+
+    id: string | undefined;
 }
 
 export { ICreateUserDTO };
