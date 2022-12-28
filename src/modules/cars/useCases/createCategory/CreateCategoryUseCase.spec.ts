@@ -1,14 +1,14 @@
 import { AppError } from '../../../../errors/AppError';
-import { InMemoryCategoriesRepository } from '../../repositories/in-memory/InMemoryCategoriesRepository';
+import { CategoriesRepositoryInMemory } from '../../repositories/in-memory/CategoriesRepositoryInMemory';
 import { CreateCategoryUseCase } from './CreateCategoryUseCase';
 
-let inMemoryCategoriesRepository: InMemoryCategoriesRepository;
+let categoriesRepositoryInMemory: CategoriesRepositoryInMemory;
 let createCategoryUseCase: CreateCategoryUseCase;
 describe('Create Category', () => {
     beforeEach(() => {
-        inMemoryCategoriesRepository = new InMemoryCategoriesRepository();
+        categoriesRepositoryInMemory = new CategoriesRepositoryInMemory();
         createCategoryUseCase = new CreateCategoryUseCase(
-            inMemoryCategoriesRepository,
+            categoriesRepositoryInMemory,
         );
     });
     it('should be able to create a new category', async () => {
@@ -18,7 +18,7 @@ describe('Create Category', () => {
         };
         await createCategoryUseCase.execute(category);
 
-        const categoryCreated = await inMemoryCategoriesRepository.findByName(
+        const categoryCreated = await categoriesRepositoryInMemory.findByName(
             category.name,
         );
 

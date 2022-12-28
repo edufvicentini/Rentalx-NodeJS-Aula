@@ -4,7 +4,7 @@ import {
     ICreateCategoryDTO,
 } from '../ICategoriesRepository';
 
-class InMemoryCategoriesRepository implements ICategoriesRepository {
+class CategoriesRepositoryInMemory implements ICategoriesRepository {
     categories: Category[] = [];
     async findByName(name: string): Promise<Category | undefined> {
         const category = this.categories.find(
@@ -29,4 +29,4 @@ class InMemoryCategoriesRepository implements ICategoriesRepository {
     }
 }
 
-export { InMemoryCategoriesRepository };
+export { CategoriesRepositoryInMemory };
